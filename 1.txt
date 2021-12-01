@@ -1,0 +1,4 @@
+NODE_ENV=production
+JWT_SECRET=0fcbada8a9e4b635b103ef2610df851ec30e2d44bed6af3c84d9ef6720af6b53
+MONGO_SERVER=mongodb://localhost:27017/moviesdb
+PORT=3000

@@ -105,4 +105,5 @@ module.exports = {
   updateUser,
   createUser,
   login,
+  randomString,
 };
