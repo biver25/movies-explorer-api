@@ -5,9 +5,6 @@ const NotFoundError = require('../errors/NotFoundError');
 const ConflictError = require('../errors/ConflictError');
 
 const addUserMovie = (req, res, next) => {
-  //
-  req.user._id = req.body.user._id;
-  //
   const {
     country,
     director,
@@ -52,9 +49,6 @@ const addUserMovie = (req, res, next) => {
 };
 
 const deleteUserMovie = (req, res, next) => {
-  //
-  req.user._id = req.body.user._id;
-  //
   // Movie.findOne({ movieId: req.params.movieId, owner: req.user._id })
   //   .orFail(new Error('NotValidId'))
   //   .then((movie) => {
@@ -85,9 +79,6 @@ const deleteUserMovie = (req, res, next) => {
 };
 
 const getUserMovies = (req, res, next) => {
-  //
-  req.user._id = req.body.user._id;
-  //
   Movie.find({ owner: req.user._id })
     .then((movies) => res.status(200).send(movies))
     .catch(next);
