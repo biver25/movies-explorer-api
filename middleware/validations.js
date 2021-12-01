@@ -40,15 +40,15 @@ const validateAddUserMovies = celebrate({
     image: Joi.string().regex(regexp).required(),
     trailer: Joi.string().regex(regexp).required(),
     thumbnail: Joi.string().regex(regexp).required(),
-    movieId: Joi.string().length(24).hex(),
+    movieId: Joi.number().required(),
     nameRU: Joi.string().required(),
     nameEN: Joi.string().required(),
-  }),
+  }).unknown(true), // удалить unknown
 });
 
 const validateDeleteUserMovies = celebrate({
   params: Joi.object().keys({
-    movieID: Joi.string().length(24).hex(),
+    movieId: Joi.number().required(),
   }),
 });
 
