@@ -1,6 +1,7 @@
 const corsOptions = {
   origin: ['http://localhost:3000',
     'http://localhost:3001',
+    'https://movies.biver.nomoredomains.rocks/',
   ],
   optionsSuccessStatus: 200,
   methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
