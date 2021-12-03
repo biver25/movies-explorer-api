@@ -1,7 +1,8 @@
 const Movie = require('../models/movie');
 const ValidationError = require('../errors/ValidationError');
-const NotFoundError = require('../errors/NotFoundError');
-// const ForbiddenError = require('../errors/ForbiddenError');
+const IdValidationError = require('../errors/IdValidationError');
+const MovieNotFoundError = require('../errors/MovieNotFoundError');
+const ForbiddenError = require('../errors/ForbiddenError');
 const ConflictError = require('../errors/ConflictError');
 
 const addUserMovie = (req, res, next) => {
@@ -21,7 +22,7 @@ const addUserMovie = (req, res, next) => {
   Movie.find({ movieId, owner: req.user._id })
     .then((data) => {
       if (data.length > 0) {
-        next(new ConflictError('409 - Карточка с указанным movieId уже существует'));
+        next(new ConflictError());
       } else {
         Movie.create({
           country,
@@ -40,7 +41,7 @@ const addUserMovie = (req, res, next) => {
           .then((movie) => res.status(200).send(movie))
           .catch((err) => {
             if (err.name === 'ValidationError') {
-              next(new ValidationError('400 — Переданы некорректные данные при создании карточки'));
+              next(new ValidationError());
             } else { next(err); }
           });
       }
@@ -49,33 +50,33 @@ const addUserMovie = (req, res, next) => {
 };
 
 const deleteUserMovie = (req, res, next) => {
-  // Movie.findOne({ movieId: req.params.movieId, owner: req.user._id })
-  //   .orFail(new Error('NotValidId'))
-  //   .then((movie) => {
-  //     if (movie.owner.toString() === req.user._id) {
-  Movie.findOneAndRemove({ movieId: req.params.movieId, owner: req.user._id })
+  Movie.findById(req.params.id)
     .orFail(new Error('NotValidId'))
-    .then((data) => res.send(data))
+    .then((movie) => {
+      if (movie.owner.toString() === req.user._id) {
+        Movie.findByIdAndRemove(req.params.id)
+          .orFail(new Error('NotValidId'))
+          .then((data) => res.send(data))
+          .catch((err) => {
+            if (err.message === 'NotValidId') {
+              next(new MovieNotFoundError());
+            } else { next(err); }
+            // if (err.name === 'CastError') {
+            //   next(new IdValidationError());
+            // } else { next(err); }
+          });
+      } else {
+        next(new ForbiddenError());
+      }
+    })
     .catch((err) => {
       if (err.message === 'NotValidId') {
-        next(new NotFoundError('404 - Карточка с указанным _id не найдена'));
+        next(new MovieNotFoundError());
       }
       if (err.name === 'CastError') {
-        next(new ValidationError('400 - _id карточки указан в неправильном формате'));
+        next(new IdValidationError());
       } else { next(err); }
     });
-//      } else {
-//        next(new ForbiddenError('403 - Нет прав на удаление этой карточки'));
-//      }
-//    })
-//    .catch((err) => {
-//      if (err.message === 'NotValidId') {
-//        next(new NotFoundError('404 - Карточка с указанным _id не найдена'));
-//      }
-//      if (err.name === 'CastError') {
-//        next(new NotFoundError('404 - _id карточки указан в неправильном формате'));
-//      } else { next(err); }
-//    });
 };
 
 const getUserMovies = (req, res, next) => {
